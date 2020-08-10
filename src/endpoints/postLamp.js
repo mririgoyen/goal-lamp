@@ -3,22 +3,38 @@ const sleep = require('util').promisify(setTimeout);
 
 const config = require('../../config');
 
-const postLamp = async (req, res) => {
-  try {
-    const { defaultDurationInSeconds, lampPin } = config;
+const postLamp = ({ horn, hornDuration }) => async (req, res) => {
+  const { defaultDurationInSeconds = 30, lampPin } = config;
 
+  const {
+    body: {
+      audio = true,
+      duration = defaultDurationInSeconds
+    } = {}
+  } = req;
+
+  try {
     const status = await gpio.read(lampPin);
     if (status) {
       await gpio.write(lampPin, false);
+      horn.stop();
       return res.json({ active: false });
     }
 
-    await gpio.write(lampPin, true);
-    res.json({ action: true, duration: defaultDurationInSeconds });
+    if (audio) {
+      horn.play();
+      horn.on('complete', async () => {
+        await gpio.write(lampPin, false);
+      });
+    }
 
-    // TODO: Turn lamp on for duration of audio clip
-    await sleep(defaultDurationInSeconds * 1000);
-    await gpio.write(lampPin, false);
+    await gpio.write(lampPin, true);
+    res.json({ action: true, duration: audio ? hornDuration : duration });
+
+    if (!audio) {
+      await sleep(duration * 1000);
+      await gpio.write(lampPin, false);
+    }
     return;
   } catch (error) {
     res.status(580);

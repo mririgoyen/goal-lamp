@@ -12,7 +12,8 @@
     "async-mqtt": "^2.6.1",
     "node-aplay": "^1.0.3",
     "restify": "^8.5.1",
-    "rpi-gpio": "^2.1.7"
+    "rpi-gpio": "^2.1.7",
+    "wav-file-info": "^0.0.10"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
