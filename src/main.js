@@ -1,43 +1,32 @@
 const path = require('path');
+const MQTT = require('async-mqtt');
 const restify = require('restify');
 const gpio = require('rpi-gpio').promise;
 const Sound = require('node-aplay');
-const wavFileInfo = require('util').promisify(require('wav-file-info').infoByFilename);
 
 const config = require('../config');
+const configureHorn = require('./lib/configureHorn');
+const mqttConnection = require('./connections/mqtt');
+
 const durationMiddleware = require('./middleware/durationMiddleware');
 const getLamp = require('./endpoints/getLamp');
 const postLamp = require('./endpoints/postLamp');
 
-const server = restify.createServer({ name: 'goallamp' });
-server.use(restify.plugins.queryParser());
-server.use(restify.plugins.bodyParser());
-
-const configureAudio = async () => {
-  try {
-    const soundPath = path.resolve(__dirname, './audio/goal.wav');
-    const horn = new Sound(soundPath);
-    const { duration } = await wavFileInfo(soundPath);
-    return {
-      horn,
-      hornDuration: Math.ceil(duration)
-    };
-  } catch (error) {
-    console.log(`[ERROR] ${error}`);
-    process.exit(1);
-  }
-};
-
 (async () => {
   try {
     await gpio.setup(config.lampPin, gpio.DIR_LOW);
-    const audio = await configureAudio();
+    const audio = await configureHorn();
 
-    server.get('/api/health', (_, res) => res.json({ status: 'OK' }));
+    const mqtt = MQTT.connect('tcp://192.168.1.210:1883', { clientId: 'goal-lamp' });
+    mqtt.on('connect', mqttConnection.connect(mqtt));
+    mqtt.on('message', mqttConnection.message(mqtt, audio));
+
+    const server = restify.createServer({ name: 'goallamp' });
+    server.use(restify.plugins.bodyParser());
     server.get('/api/lamp', getLamp);
-    server.post('/api/lamp', [ durationMiddleware ], postLamp(audio));
+    server.post('/api/lamp', [ durationMiddleware ], postLamp(audio, mqtt));
 
-    server.listen(80, () => {
+    server.listen(80, async () => {
       console.log('🚨 Goal Lamp server listening on Port 80');
       new Sound(path.resolve(__dirname, './audio/start.wav')).play();
     });
@@ -46,7 +35,8 @@ const configureAudio = async () => {
   }
 })();
 
-process.on('SIGINT', (_) => {
-  gpio.destroy();
+process.on('SIGINT', async (_) => {
+  await gpio.destroy();
+  await mqtt.end();
   process.exit(1);
 });
