@@ -1,0 +1,7 @@
+{
+  "append": true,
+  "script": "main.js",
+  "sourceDir": "/share/goallamp/src",
+  "uid": "goallamp",
+  "watch": true
+}
