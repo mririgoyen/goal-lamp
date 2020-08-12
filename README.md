@@ -51,7 +51,7 @@ Provide a `mqttServer` in `config.js` to enable the MQTT server.
 
 ### Supported Teams
 
-I am a Blackhawks fan first and a Lightning fan second. Those two are included in `src/audio/teams`. You can include any other teams (or any other sounds), by dropping a `WAV` file in that folder. Keep the name of the file free of spaces and lowercase. You use the filename (minus extension) as the `team` parameter when making the call to turn the lamp on.
+I am a Blackhawks fan first and a Lightning fan second. Those two are included in `src/audio/teams`. You can include any other teams (or any other sounds), by dropping a `WAV` file in that folder. Keep the name of the file lowercase and free of spaces. You use the filename (minus extension) as the `team` parameter when making the call to turn the lamp on.
 
 ### Starting the Service
 
