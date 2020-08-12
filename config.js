@@ -1,8 +1,5 @@
 module.exports = {
   defaultDurationInSeconds: 10,
   lampPin: 7,
-  mqtt: {
-    commandTopic: 'goallamp/set',
-    stateTopic: 'goallamp/state'
-  }
+  mqttServer: 'tcp://192.168.1.210:1883'
 };

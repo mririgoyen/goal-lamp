@@ -1,28 +1,24 @@
 const gpio = require('rpi-gpio').promise;
-const sleep = require('util').promisify(setTimeout);
 
+const { defaultDurationInSeconds = 30, lampPin } = require('../../config');
 const lampOff = require('./lampOff');
 
-const {
-  defaultDurationInSeconds = 30,
-  lampPin,
-  mqtt: { stateTopic }
-} = require('../../config');
-
 const toggleLamp = async ({
-  audio = true,
   duration = defaultDurationInSeconds,
-  horn: { hornDuration, horn },
+  horns,
   mqtt,
-  state = 'ON'
+  state = 'ON',
+  team
 }) => {
   try {
+    const { horn, hornDuration } = horns[team] || {};
     const status = await gpio.read(lampPin);
     if (state === 'OFF' || status) {
       return await lampOff(gpio, mqtt, horn);
+      return;
     }
 
-    if (audio) {
+    if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
     } else {
@@ -30,8 +26,8 @@ const toggleLamp = async ({
     }
 
     await gpio.write(lampPin, true);
-    await mqtt.publish(stateTopic, 'ON');
-    return { duration: audio ? hornDuration : duration };
+    await mqtt.publish('goallamp/state', 'ON');
+    return { duration: horn ? hornDuration : duration };
   } catch (error) {
     console.error(error);
     throw error;

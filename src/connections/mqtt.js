@@ -1,16 +1,24 @@
-const { mqtt: { commandTopic } } = require('../../config');
 const toggleLamp = require('../lib/toggleLamp');
 
-const connect = (mqtt) => async () => {
+const connect = (mqtt, horns) => async () => {
   console.log('🦟 Connected to local MQTT server');
-  await mqtt.subscribe(commandTopic);
+  const subscriptions = Object.keys(horns).map((team) => mqtt.subscribe(`goallamp/${team}/set`));
+  return Promise.all(subscriptions);
 };
 
-const message = (mqtt, horn) => async (topic, message) => {
-  if (topic !== commandTopic) {
+const message = (mqtt, horns) => async (topic, message) => {
+  const [ domain, team, command ] = topic.split('/');
+
+  if (domain !== 'goallamp' || domain === 'goallamp' && command !== 'set') {
     return;
   }
-  await toggleLamp({ audio: true, horn, mqtt, state: message.toString() });
+
+  await toggleLamp({ audio: true, horns, mqtt, state: message.toString(), team });
 };
 
-module.exports = { connect, message };
+const mock = {
+  end: async () => {},
+  publish: async () => {}
+};
+
+module.exports = { connect, message, mock };
