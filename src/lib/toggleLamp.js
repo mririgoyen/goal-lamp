@@ -4,12 +4,13 @@ const { defaultDurationInSeconds = 30, lampPin } = require('../../config');
 const lampOff = require('./lampOff');
 
 const toggleLamp = async ({
-  duration = defaultDurationInSeconds,
+  duration,
   horns,
   mqtt,
   state = 'on'
 }) => {
   try {
+    const overrideDuration = duration >= 0 ? duration : defaultDurationInSeconds;
     const { horn, hornDuration } = horns[state] || {};
     const status = await gpio.read(lampPin);
     if (state === 'off' || status) {
@@ -19,14 +20,14 @@ const toggleLamp = async ({
     if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
-    } else if (duration > 0) {
+    } else if (overrideDuration > 0) {
       setTimeout(async () => await lampOff(gpio, mqtt), duration * 1000);
     }
 
     await gpio.write(lampPin, true);
     await mqtt.publish('goallamp/state', state);
 
-    return { duration: horn ? hornDuration : duration };
+    return { duration: horn ? hornDuration : overrideDuration };
   } catch (error) {
     console.error(error);
     throw error;
