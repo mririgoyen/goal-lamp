@@ -22,7 +22,7 @@ let mqtt = mqttConnection.mock;
 
     if (config.mqttServer) {
       mqtt = MQTT.connect(config.mqttServer, { clientId: 'goal-lamp' });
-      mqtt.on('connect', mqttConnection.connect(mqtt, horns));
+      mqtt.on('connect', mqttConnection.connect(mqtt));
       mqtt.on('message', mqttConnection.message(mqtt, horns));
     }
 

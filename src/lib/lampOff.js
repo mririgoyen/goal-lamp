@@ -1,8 +1,7 @@
 const { lampPin } = require('../../config');
 
 const lampOff = async (gpio, mqtt, horn) => {
-  await mqtt.publish('goallamp/state', 'OFF');
-  await mqtt.publish('goallamp/team', 'none');
+  await mqtt.publish('goallamp/state', 'off');
   await gpio.write(lampPin, false);
 
   if (horn) {
