@@ -12,7 +12,7 @@ const message = (mqtt, horns) => async (topic, message) => {
     return;
   }
 
-  const state = message.toString();
+  const state = message.toString().toLowerCase();
   const duration = state === 'on' ? 0 : undefined;
   await toggleLamp({ audio: true, duration, horns, mqtt, state });
 };
