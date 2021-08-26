@@ -21,7 +21,7 @@ const toggleLamp = async ({
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
     } else if (overrideDuration > 0) {
-      setTimeout(async () => await lampOff(gpio, mqtt), duration * 1000);
+      setTimeout(async () => await lampOff(gpio, mqtt), overrideDuration * 1000);
     }
 
     await gpio.write(lampPin, true);
