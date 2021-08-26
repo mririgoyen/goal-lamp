@@ -4,7 +4,7 @@ const postLamp = (horns, mqtt) => async (req, res) => {
   const { body: { duration, team } = {} } = req;
 
   try {
-    const lamp = await toggleLamp({ duration, horns, mqtt, team });
+    const lamp = await toggleLamp({ duration, horns, mqtt, state: team });
     res.json({ active: !!duration, lamp });
   } catch (error) {
     console.error(error);
