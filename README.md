@@ -34,11 +34,14 @@ POST Body
 {
   // Duration - Integer - OPTIONAL
   // Amount of time to power the light if `team` is not provided. Does not play any sounds.
-  duration: 10, // Default is 30, overwriteable in `config.js`, overwritable per REST call
+  // Default duration is 30 seconds, overwritable in `config.js`, overwritable per REST call
+  // Provide a duration of 0 to keep the light on indefinitely
+  duration: 10,
 
   // Team - String - OPTIONAL
   // The team's horn to play, light will power up for duration of the horn sound.
-  team: 'blackhawks' // See "Supported Teams" below
+   // See "Supported Teams" below.
+  team: 'blackhawks'
 }
 ```
 
@@ -48,6 +51,7 @@ Provide a `mqttServer` in `config.js` to enable the MQTT server.
 
 - Publish `ON/OFF` to `goallamp/{team}/set`.
 - Subscribe to `goallamp/state` to get `ON/OFF` status of lamp.
+- Subscribe to `goallamp/team` to get team horn currently playing. (Will be "None" if no team horn is playing.)
 
 ### Supported Teams
 

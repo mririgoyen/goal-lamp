@@ -15,18 +15,22 @@ const toggleLamp = async ({
     const status = await gpio.read(lampPin);
     if (state === 'OFF' || status) {
       return await lampOff(gpio, mqtt, horn);
-      return;
     }
 
     if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
-    } else {
+    } else if (duration > 0) {
       setTimeout(async () => await lampOff(gpio, mqtt), duration * 1000);
     }
 
     await gpio.write(lampPin, true);
     await mqtt.publish('goallamp/state', 'ON');
+
+    if (team) {
+      await mqtt.publish('goallamp/team', team);
+    }
+
     return { duration: horn ? hornDuration : duration };
   } catch (error) {
     console.error(error);

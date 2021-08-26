@@ -32,7 +32,7 @@ let mqtt = mqttConnection.mock;
     server.post('/api/lamp', [ durationMiddleware, teamMiddleware(horns) ], postLamp(horns, mqtt));
 
     server.listen(80, async () => {
-      console.log('🚨 Goal Lamp server listening on Port 80');
+      console.log('🚨 Goal Lamp server listening on Port 80 🚨');
       new Sound(path.resolve(__dirname, './audio/start.wav')).play();
     });
   } catch (error) {
