@@ -12,10 +12,9 @@ const message = (mqtt, horns) => async (topic, message) => {
     return;
   }
 
-  console.log({ message });
-
-  const duration = message === 'on' ? 0 : undefined;
-  await toggleLamp({ audio: true, duration, horns, mqtt, state: message });
+  const state = message.toString();
+  const duration = state === 'on' ? 0 : undefined;
+  await toggleLamp({ audio: true, duration, horns, mqtt, state });
 };
 
 const mock = {

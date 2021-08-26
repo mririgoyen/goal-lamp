@@ -4,7 +4,7 @@ const { defaultDurationInSeconds = 30, lampPin } = require('../../config');
 const lampOff = require('./lampOff');
 
 const toggleLamp = async ({
-  duration,
+  duration = defaultDurationInSeconds,
   horns,
   mqtt,
   state = 'on'
@@ -23,15 +23,15 @@ const toggleLamp = async ({
     if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
-    } else if (overrideDuration > 0) {
+    } else if (duration > 0) {
       console.log('Setting auto-off');
-      setTimeout(async () => await lampOff(gpio, mqtt), overrideDuration * 1000);
+      setTimeout(async () => await lampOff(gpio, mqtt), duration * 1000);
     }
 
     await gpio.write(lampPin, true);
     await mqtt.publish('goallamp/state', state);
 
-    return { duration: horn ? hornDuration : overrideDuration };
+    return { duration: horn ? hornDuration : duration };
   } catch (error) {
     console.error(error);
     throw error;
