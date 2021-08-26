@@ -13,7 +13,7 @@ const toggleLamp = async ({
     const { horn, hornDuration } = horns[state] || {};
     const status = await gpio.read(lampPin);
     if (state === 'off' || status) {
-      return await lampOff(gpio, mqtt, horn);
+      return await lampOff(gpio, mqtt, horns);
     }
 
     if (horn) {
