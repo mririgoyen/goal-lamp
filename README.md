@@ -50,8 +50,9 @@ POST Body
 Provide a `mqttServer` in `config.js` to enable the MQTT server.
 
 - Publish `ON/OFF` to `goallamp/{team}/set`.
+  - Use "none" for the team to keep the lamp on indefinitely.
 - Subscribe to `goallamp/state` to get `ON/OFF` status of lamp.
-- Subscribe to `goallamp/team` to get team horn currently playing. (Will be "None" if no team horn is playing.)
+- Subscribe to `goallamp/team` to get team horn currently playing. (Will be "none" if no team horn is playing.)
 
 ### Supported Teams
 

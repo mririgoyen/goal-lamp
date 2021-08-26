@@ -20,7 +20,7 @@ const toggleLamp = async ({
     if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
-    } else if (duration > 0) {
+    } else if (duration > 0 || team !== 'none') {
       setTimeout(async () => await lampOff(gpio, mqtt), duration * 1000);
     }
 
