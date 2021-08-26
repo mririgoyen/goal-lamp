@@ -11,16 +11,20 @@ const toggleLamp = async ({
 }) => {
   try {
     const overrideDuration = duration >= 0 ? duration : defaultDurationInSeconds;
+
     const { horn, hornDuration } = horns[state] || {};
     const status = await gpio.read(lampPin);
     if (state === 'off' || status) {
       return await lampOff(gpio, mqtt, horn);
     }
 
+    console.log({ duration, overrideDuration });
+
     if (horn) {
       horn.play();
       horn.on('complete', async () => await lampOff(gpio, mqtt));
     } else if (overrideDuration > 0) {
+      console.log('Setting auto-off');
       setTimeout(async () => await lampOff(gpio, mqtt), overrideDuration * 1000);
     }
 
